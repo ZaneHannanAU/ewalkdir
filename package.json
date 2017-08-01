@@ -1,0 +1,26 @@
+{
+  "name": "ewalkdir",
+  "version": "1.0.0",
+  "description": "Event-emitting asyncronous directory walker.",
+  "main": "ewalkdir.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZaneHannanAU/ewalkdir.git"
+  },
+  "keywords": [
+    "walkdir",
+    "fs",
+    "walk",
+    "directory",
+    "eventemitter"
+  ],
+  "author": "zanehannanau",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/ZaneHannanAU/ewalkdir/issues"
+  },
+  "homepage": "https://github.com/ZaneHannanAU/ewalkdir#readme"
+}
