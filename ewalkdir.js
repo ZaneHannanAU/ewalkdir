@@ -157,7 +157,6 @@ class ewalkdir extends EventEmitter {
   }
 }
 
-// exports = module.exports = ewalkdir;
 exports = module.exports = (opts) => ewalkdir.walk(opts);
 exports.walk = (opts) => ewalkdir.walk(opts);
 exports.emittable = types;

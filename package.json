@@ -17,6 +17,7 @@
     "directory",
     "eventemitter"
   ],
+  "engines" : { "node" : ">=8.0.0" },
   "author": "zanehannanau",
   "license": "GPL-3.0",
   "bugs": {

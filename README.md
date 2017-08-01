@@ -38,3 +38,10 @@ Can be set by `ewalkdir({key: value})`
 * `symboliclink` (if `fs.Stats.isSymbolicLink()`, controlled by option `emitSymbolicLinks`)
 * `fifo` (if `fs.Stats.isFIFO()`, controlled by option `emitFIFOs`, First In First Out/"Queue")
 * `socket` (if `fs.Stats.isSocket()`, controlled by option `emitSockets`)
+
+## Usecases
+
+Current usecases involve:
+
+* Finding and/or hashing a large amount of files in several seconds.
+* Mapping a directory into many stat instances.
