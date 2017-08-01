@@ -1,6 +1,6 @@
 {
   "name": "ewalkdir",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Event-emitting asyncronous directory walker.",
   "main": "ewalkdir.js",
   "scripts": {
@@ -17,7 +17,9 @@
     "directory",
     "eventemitter"
   ],
-  "engines" : { "node" : ">=8.0.0" },
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "author": "zanehannanau",
   "license": "GPL-3.0",
   "bugs": {
