@@ -1,7 +1,7 @@
 const path = require('path');
 const util = require('util');
 const fs = require('fs');
-const [stat, readdir] = [fs.lstat, fs.readdir].map(util.promisify)
+const [stat, readdir, readlink] = [fs.lstat, fs.readdir, fs.readlink].map(util.promisify);
 const {EventEmitter} = require('events');
 const none = /^(node_modules|\..*)$/g
 const types = 'file;dir;blockdevice;characterdevice;symboliclink;fifo;socket'.split(/;/g)
@@ -12,14 +12,20 @@ class ewalkdir extends EventEmitter {
    * @extends {events} eventemitter
    * @arg {string|array<...string>} dir to scan
    * @arg {string|array<...string>} dirs - alternatives to scan
-   * @arg {number} depth to scan to.
+   * @arg {number} maxDepth to scan to.
+   * @arg {number} depth - same as maxDepth, waterfalls from maxDepth.
+   * @arg {string} relTop - relative directory to the top, allows naming of different files for different subsystems of the same application.
+   * @arg {boolean} readlinks - follow symbolic links.
+   * @arg {boolean} followLinks - ditto.
+   * @arg {boolean} followSymlinks - ditto.
    * @arg {boolean} keepFound - keep the found items in ewalkdir.foundItems
    * @arg {regex} no - a filter, I couldn't find a better name for it.
    * @arg {boolean} emitDefault - emits all by default.
    * @arg {boolean} emit* - uses the same as emitDefault.
    */
   constructor({
-    dir, dirs, depth = Infinity,
+    dir, dirs, maxDepth = Infinity, depth = maxDepth, relTop,
+    readlinks = false, followLinks = readlinks, followSymlinks = followLinks,
     keepFound = false, no = none,
 
     emitDefault = true, emitFiles = emitDefault, emitDirs = emitDefault,
@@ -39,20 +45,21 @@ class ewalkdir extends EventEmitter {
       emitCharacterDevices, emitSymbolicLinks,
       emitFIFOs, emitSockets, no, depth,
       emit: this.emit.bind(this),
-      walk: this.walk.bind(this)
+      walk: this.walk.bind(this),
+      followSymlinks
     };
 
     if (dir && Array.isArray(dir))
-      dir.forEach(io => setImmediate(this.walk, {dir: io, depth, opts}))
+      dir.forEach(io=>setImmediate(this.walk, {dir: io, depth, opts, relTop}))
     else if (dir && typeof dir === 'string')
-      setImmediate(this.walk, {dir, depth, opts})
+      setImmediate(this.walk, {dir, depth, opts, relTop})
 
     ;;
 
     if (dirs && Array.isArray(dirs))
-      dirs.forEach(io => setImmediate(this.walk, {dir: io, depth, opts}))
+      dirs.forEach(io=>setImmediate(this.walk, {dir: io, depth, opts, relTop}))
     else if (dirs && typeof dirs === 'string')
-      setImmediate(this.walk, {dir: dirs, depth, opts})
+      setImmediate(this.walk, {dir: dirs, depth, opts, relTop})
 
     ;;
 
@@ -137,9 +144,14 @@ class ewalkdir extends EventEmitter {
       setImmediate(opts.emit, 'characterdevice', {
         path: dir, dir, stats, relTop
       })
-    } else if (stats.isSymbolicLink() && opts.emitSymbolicLinks) {
-      setImmediate(opts.emit, 'symboliclink', {
+    } else if (stats.isSymbolicLink()) {
+      if (opts.emitSymbolicLinks) setImmediate(opts.emit, 'symboliclink', {
         path: dir, dir, stats, relTop
+      })
+      if (opts.followSymlinks) setImmediate(opts.walk, {
+        dir: await readlink(dir),
+        depth: depth-1,
+        relTop, opts
       })
     } else if (stats.isFIFO() && opts.emitFIFOs) {
       setImmediate(opts.emit, 'fifo', {

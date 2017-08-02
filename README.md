@@ -8,12 +8,12 @@ All the files under your homedir:
 
 ```javascript
 const ewalkdir = require('ewalkdir');
-const home = require('os').homedir();
-const walker = ewalkdir(home)
-.on('file', ({dir, stats, relTop}) => {
+const dir = require('os').homedir();
+const walker = ewalkdir(dir)
+.on('file', ({dir,/* path,*/ stats, relTop}) => {
   console.log('dir', dir, stats);
 })
-.on('symboliclink', ({dir, stats, relTop}) => {
+.on('symboliclink', ({dir,/* path,*/ stats, relTop}) => {
   console.log('symboliclink', dir, stats)
 })
 ```
@@ -24,6 +24,8 @@ Can be set by `ewalkdir({key: value})`
 
 * `dir` and/or `dirs`: `string` or `array` of `string`s pointing to directories to scan.
 * `depth`: `number` (default `Infinity`); defines what depth to explore to.
+* `relTop`: `string` (default `"/"`); relative path to top scan, included in all events except `ready`.
+* `readlinks`/`followLinks`/`followSymlinks`: `boolean` (default `false`); follow symbolic links. Subitems will emit as if it were a directory, with the exception of the `{dir, path = dir}` attributes which will be completely different; but will follow the same `{relTop}` attribute.
 * `keepFound`: `boolean` (default `false`); keeps data in a `Map` under `this.foundItems`.
 * `no`: `regex` (default `/^(node_modules|\..*)$/g`); filter; returns true on `no.test` if not to be scanned.
 * `emitDefault`: `boolean` (default `true`); sets default for all emitters.
