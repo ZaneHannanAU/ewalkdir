@@ -31,6 +31,8 @@ Can be set by `ewalkdir({key: value})`
 
 ## Events/emittables
 
+* `ready` emitted before beginning directory walking and emitting of data.
+* `walk` emitted every walked item.
 * `file` (if `fs.Stats.isFile()`, controlled by option `emitFiles`)
 * `dir` (if `fs.Stats.isDirectory()`, controlled by option `emitDirectorys`)
 * `blockdevice` (if `fs.Stats.isBlockDevice()`, controlled by option `emitBlockDevices`)
@@ -38,6 +40,14 @@ Can be set by `ewalkdir({key: value})`
 * `symboliclink` (if `fs.Stats.isSymbolicLink()`, controlled by option `emitSymbolicLinks`)
 * `fifo` (if `fs.Stats.isFIFO()`, controlled by option `emitFIFOs`, First In First Out/"Queue")
 * `socket` (if `fs.Stats.isSocket()`, controlled by option `emitSockets`)
+
+## Event structure
+
+All events, excluding `ready` and `walk`, attach a `{dir, path = dir, stats, relTop}` event, documenting the `{dir, path}` to the item, `{stats}` is an `fs.Stats` object and `relTop` is a HTTP relative path if a server was based on it.
+
+Event `ready` emits no data.
+
+Event `walk` emits `{dir, path = dir, depth, relTop}` regardless.
 
 ## Usecases
 

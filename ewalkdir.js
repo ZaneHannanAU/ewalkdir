@@ -105,14 +105,14 @@ class ewalkdir extends EventEmitter {
    * @async
    */
   async walk({dir, depth = Infinity, relTop = '/', opts}) {
-    setImmediate(opts.emit, 'walk', {dir, depth, relTop})
+    setImmediate(opts.emit, 'walk', {path: dir, dir, depth, relTop})
     const stats = await stat(dir);
     // console.log({this: this, opts});
     if (stats.isFile() && opts.emitFiles) {
-      setImmediate(opts.emit, 'file', {path: dir, stats, relTop})
+      setImmediate(opts.emit, 'file', {path: dir, dir, stats, relTop})
     } else if (stats.isDirectory()) {
       if (opts.emitDirs)
-        setImmediate(opts.emit, 'dir', {path: dir, stats, relTop})
+        setImmediate(opts.emit, 'dir', {path: dir, dir, stats, relTop})
       ;;
 
       if (depth-1 > 0) {
@@ -130,15 +130,25 @@ class ewalkdir extends EventEmitter {
         };
       };
     } else if (stats.isBlockDevice() && opts.emitBlockDevices) {
-      setImmediate(opts.emit, 'blockdevice', {dir, stats, relTop})
+      setImmediate(opts.emit, 'blockdevice', {
+        path: dir, dir, stats, relTop
+      })
     } else if (stats.isCharacterDevice() && opts.emitCharacterDevices) {
-      setImmediate(opts.emit, 'characterdevice', {dir, stats, relTop})
+      setImmediate(opts.emit, 'characterdevice', {
+        path: dir, dir, stats, relTop
+      })
     } else if (stats.isSymbolicLink() && opts.emitSymbolicLinks) {
-      setImmediate(opts.emit, 'symboliclink', {dir, stats, relTop})
+      setImmediate(opts.emit, 'symboliclink', {
+        path: dir, dir, stats, relTop
+      })
     } else if (stats.isFIFO() && opts.emitFIFOs) {
-      setImmediate(opts.emit, 'fifo', {dir, stats, relTop})
+      setImmediate(opts.emit, 'fifo', {
+        path: dir, dir, stats, relTop
+      })
     } else if (stats.isSocket() && opts.emitSockets) {
-      setImmediate(opts.emit, 'socket', {dir, stats, relTop})
+      setImmediate(opts.emit, 'socket', {
+        path: dir, dir, stats, relTop
+      })
     };
   }
 
@@ -149,7 +159,7 @@ class ewalkdir extends EventEmitter {
     this.foundItems = {};
     types.forEach(type => {
       this.foundItems[type] = new Map;
-      this.on(type, ({path: name, stats, relTop}) => setImmediate(() => {
+      this.on(type, ({dir: name, /*path, */stats, relTop}) => setImmediate(() => {
         this.foundItems[type].set(name, stats)
         this.foundItems[type].set(relTop, stats)
       }))
